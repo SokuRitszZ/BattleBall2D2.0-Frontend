@@ -1,7 +1,7 @@
 import getInfoApi from "@/api/user/get_info";
 import loginApi from "@/api/user/login";
 import registerApi from "@/api/user/register";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type typeUser = {
   id: string;
@@ -18,23 +18,18 @@ type typeAuthUser = typeUser & {
 
 const userInit: typeAuthUser = {
   id: "0",
-  name: "",
-  avatar: "",
+  name: "Raul",
+  avatar: "https://sdfsdf.dev/100x100.png",
   status: "not logging",
   token: "",
 };
 
 function useUser() {
-  const [user, setUser] = useState<typeAuthUser>({...userInit});
-
-  const refUser = useRef<typeAuthUser>({...userInit});
-
-  useEffect(() => {
-    refUser.current = user;
-  }, [user]);
+  const [user, setUser] = useState<typeAuthUser>({ ...userInit });
+  const refUser = useRef<typeAuthUser>({ ...userInit });
 
   function setState(status: typeStatus) {
-    if (!refUser.current) return ;
+    if (!refUser.current) return;
     setUser({
       ...refUser.current,
       status,
@@ -42,20 +37,32 @@ function useUser() {
   }
 
   function setToken(token: string) {
-    if (!refUser.current) return ;
+    if (!refUser.current) return;
     setUser({
       ...refUser.current,
       token,
     });
   }
-  
-  function login(loginService: {name: string, password: string}) {
+
+  // 自动更新拿到最新 user 数据
+  useEffect(() => {
+    refUser.current = user;
+  }, [user]);
+
+  // 打开自动登录
+  const getToken = useMemo(() => {
+    setToken(localStorage.getItem("token") || "");
+    return user.token;
+  }, [user.token]);
+
+  useEffect(() => {
+    localStorage.setItem("token", user.token);
+  }, [user.token]);
+
+  useEffect(() => {
+    if (!getToken) return;
     setState("logging in");
-    loginApi(loginService)
-      .then((data: any) => {
-        setToken(data.token);
-        return getInfoApi(data.token);
-      })
+    getInfoApi({ token: getToken })
       .then((data: typeUser) => {
         setUser({
           ...refUser.current,
@@ -66,25 +73,44 @@ function useUser() {
       .catch(() => {
         setState("not logging");
       });
+  }, []);
+
+  // 登录
+  async function login(loginService: { name: string; password: string }) {
+    try {
+      setState("logging in");
+      const { token } = await loginApi(loginService);
+      setToken(token);
+      const userGet: typeUser = await getInfoApi({ token });
+      setUser({
+        ...refUser.current,
+        ...userGet,
+        status: "logged in",
+      });
+    } catch (e) {
+      setState("not logging");
+    }
   }
 
-  function register(registerService: {name: string, password: string, confirmedPassword: string}) {
-    setState("logging in");
-    registerApi(registerService)
-      .then((data: any) => {
-        setToken(data.token);
-        return getInfoApi(data.token);
-      })
-      .then((data: typeUser) => {
-        setUser({
-          ...refUser.current,
-          ...data,
-          status: "logged in",
-        });
-      })
-      .catch(() => {
-        setState("not logging");
+  // 注册
+  async function register(registerService: {
+    name: string;
+    password: string;
+    confirmedPassword: string;
+  }) {
+    try {
+      setState("logging in");
+      const { token } = await registerApi(registerService);
+      setToken(token);
+      const userGet: typeUser = await getInfoApi({ token });
+      setUser({
+        ...refUser.current,
+        ...userGet,
+        status: "logged in",
       });
+    } catch (e) {
+      setState("not logging");
+    }
   }
 
   return {

@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import useUser from "@/hooks/useUser";
+import { Link } from 'react-router-dom';
 
 function AccountView() {
   const $inputName = useRef<HTMLInputElement>(null);
@@ -47,7 +48,7 @@ function AccountView() {
 
   function viewForm() {
     return (
-      <>
+      <div className="text-gray-600">
         <label htmlFor="name">用户名</label>
         <input
           ref={$inputName}
@@ -69,25 +70,30 @@ function AccountView() {
           type="password"
           id="confirmed-password"
         />
-        <div className="w-full grid grid-cols-2 gap-2 mt-3">
+        <div className="w-full grid grid-cols-2 gap-2 mt-6">
           <Button onClick={handleRegister}>注册</Button>
           <Button onClick={handleLogin}>登录</Button>
         </div>
-      </>
+      </div>
     );
   }
 
   function viewLogging() {
-    return <>Logging in...</>;
+    return <div className="text-5xl w-full h-full flex justify-center items-center">Logging in...</div>;
   }
 
   function viewLoggedIn() {
     return (
       <>
-        <div className="w-full h-full flex justify-center items-center">
+        <div className="w-full h-full flex justify-center items-center text-center">
           <div>
-            欢迎您! {user.name}
-            <img src={user.avatar} alt="" />
+            <div className="text-4xl text-gray-600">
+              欢迎您! {user.name}
+            </div>
+            <img className="mt-4 m-auto rounded-lg shadow-lg" src={user.avatar} alt="avatar" />
+            <Link to="/lobby">
+              <button className="bg-slate-500 text-white px-3 py-2 mt-5 rounded-md hover:bg-slate-600 active:ring-2 ring-slate-700">进入大厅</button>
+            </Link>
           </div>
         </div>
       </>
@@ -96,7 +102,7 @@ function AccountView() {
 
   return (
     <div className="w-screen h-screen min-w-[1200px] min-h-[700px] flex items-center justify-center">
-      <div className="bg-gray-200 w-[400px] h-[310px] rounded-md shadow-md p-3">
+      <div className="bg-gray-200 w-[400px] h-[330px] rounded-md shadow-md p-3">
         {(user.status === "not logging" && viewForm()) ||
           (user.status === "logging in" && viewLogging()) ||
           (user.status === "logged in" && viewLoggedIn())}
