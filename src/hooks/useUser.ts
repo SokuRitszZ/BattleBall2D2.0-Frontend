@@ -57,7 +57,6 @@ function useUser() {
   }, [user.token]);
 
   async function loginAuto() {
-    console.log("loginAuto")
     if (!getToken) return;
     setState("logging in");
     getInfoApi({ token: getToken })
@@ -113,6 +112,7 @@ function useUser() {
 
   return {
     user,
+    setUser,
     login,
     register,
     loginAuto,

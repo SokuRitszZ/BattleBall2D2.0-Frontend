@@ -9,7 +9,7 @@ type typeLink = {
 };
 
 function LobbyView() {
-  const userStore = useContext(UserStore);
+  const {user} = useContext(UserStore);
 
   const links: typeLink[] = [
     {
@@ -36,15 +36,16 @@ function LobbyView() {
 
   return (
     <Container>
-      <div className="w-[400px] h-[500px] bg-slate-400 rounded-xl shadow-lg flex flex-col items-center justify-center gap-2">
+      <div className="w-[400px] p-10 bg-slate-400 rounded-xl shadow-lg flex flex-col items-center justify-center gap-2">
+        <img className="shadow-xl rounded-full" src={user.avatar} alt="avatar" />
+        <div className="text-5xl mb-10">{user.name}</div>
         {links.map((l) => (
           <Link key={l.content} to={l.to}>
             <button className="px-3 py-2 bg-gray-500 hover:bg-slate-600 text-4xl text-gray-300 rounded-xl active:ring-2 ring-slate-700">
               {l.content}
             </button>
           </Link>
-          )
-        )}
+        ))}
       </div>
     </Container>
   );

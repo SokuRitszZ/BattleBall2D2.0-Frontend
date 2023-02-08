@@ -36,6 +36,7 @@ const userInit: typeAuthUser = {
 
 type typeUserStore = {
   user: typeAuthUser;
+  setUser: (user: typeAuthUser) => void;
   loginAuto: () => Promise<void>;
   register: typePromiseVoid<typeParamRegister>;
   login: typePromiseVoid<typeParamLogin>;
@@ -52,6 +53,9 @@ const storeInit: typeUserStore = {
   login: function (p: typeParamLogin): Promise<void> {
     throw new Error("Function not implemented.");
   },
+  setUser: function (user: typeAuthUser): void {
+    throw new Error("Function not implemented.");
+  }
 };
 
 export const UserStore = createContext<typeUserStore>(storeInit);
