@@ -8,7 +8,7 @@ function AccountView() {
   const $inputPassword = useRef<HTMLInputElement>(null);
   const $inputConfirmedPassword = useRef<HTMLInputElement>(null);
 
-  const { user, login, register, loginAuto } = useContext(UserStore);
+  const { user, login, register, loginAuto, logout } = useContext(UserStore);
 
   // 自动登录
   useEffect(() => {
@@ -92,11 +92,12 @@ function AccountView() {
               src={user.avatar}
               alt="avatar"
             />
-            <Link to="/lobby">
-              <button className="bg-slate-500 text-white px-3 py-2 mt-5 rounded-md hover:bg-slate-600 active:ring-2 ring-slate-700">
-                进入大厅
-              </button>
-            </Link>
+            <div className="flex gap-2 justify-center">
+              <Link to="/lobby">
+                <button className="bg-slate-500 text-white px-3 py-2 mt-5 rounded-md hover:bg-slate-600 active:ring-2 ring-slate-700"> 进入大厅 </button>
+              </Link>
+              <button onClick={logout} className="bg-slate-500 text-white px-3 py-2 mt-5 rounded-md hover:bg-slate-600 active:ring-2 ring-slate-700"> 退出账号 </button>
+            </div>
           </div>
         </div>
       </>

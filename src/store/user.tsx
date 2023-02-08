@@ -40,6 +40,7 @@ type typeUserStore = {
   loginAuto: () => Promise<void>;
   register: typePromiseVoid<typeParamRegister>;
   login: typePromiseVoid<typeParamLogin>;
+  logout: () => Promise<void>;
 };
 
 const storeInit: typeUserStore = {
@@ -54,6 +55,9 @@ const storeInit: typeUserStore = {
     throw new Error("Function not implemented.");
   },
   setUser: function (user: typeAuthUser): void {
+    throw new Error("Function not implemented.");
+  },
+  logout: function (): Promise<void> {
     throw new Error("Function not implemented.");
   }
 };

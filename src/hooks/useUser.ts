@@ -89,6 +89,11 @@ function useUser() {
     }
   }
 
+  async function logout() {
+    setToken("");
+    setState("not logging");
+  }
+
   // 注册
   async function register(registerService: {
     name: string;
@@ -116,6 +121,7 @@ function useUser() {
     login,
     register,
     loginAuto,
+    logout,
   };
 }
 

@@ -25,8 +25,8 @@ function LobbyView() {
       content: "账号设置",
     },
     {
-      to: "/lobby",
-      content: "退出账号",
+      to: "/account",
+      content: "退出大厅",
     },
     {
       to: "/lobby",
