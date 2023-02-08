@@ -1,7 +1,9 @@
-import { useContext } from "react";
-import { Link } from "react-router-dom";
-import { UserStore } from "./../../store/user";
-import Container from './../../components/Container';
+import Container from "@/components/Container";
+import { SocketStore } from "@/store/socket";
+import { UserStore } from "@/store/user";
+import { useContext, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { mode, ws } from "@/config.json";
 
 type typeLink = {
   to: string;
@@ -9,29 +11,26 @@ type typeLink = {
 };
 
 function LobbyView() {
-  const {user} = useContext(UserStore);
+  const { user } = useContext(UserStore);
+  const socket = useContext(SocketStore);
+  const loc = useLocation();
+
+  useEffect(() => {
+    socket.connect(`${ws[mode]}`);
+  }, []);
+  
+  useEffect(() => {
+    if (loc.pathname === "/" || loc.pathname === "/account") {
+      socket.close();
+    }
+  }, [loc.pathname]);
 
   const links: typeLink[] = [
-    {
-      to: "/lobby",
-      content: "单人游戏",
-    },
-    {
-      to: "/lobby",
-      content: "多人游戏",
-    },
-    {
-      to: "/settings",
-      content: "账号设置",
-    },
-    {
-      to: "/account",
-      content: "退出大厅",
-    },
-    {
-      to: "/lobby",
-      content: "公共聊天",
-    },
+    { to: "/lobby", content: "单人游戏", },
+    { to: "/lobby", content: "多人游戏", },
+    { to: "/settings", content: "账号设置", },
+    { to: "/account", content: "退出大厅", },
+    { to: "/lobby", content: "公共聊天", },
   ];
 
   return (

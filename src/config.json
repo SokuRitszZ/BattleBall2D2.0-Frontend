@@ -1,0 +1,9 @@
+{
+  "mode": 0,
+  "http": [
+    "http://localhost:8080"
+  ],
+  "ws": [
+    "ws://localhost:3000"
+  ]
+}
