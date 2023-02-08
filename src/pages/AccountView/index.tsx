@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { UserStore } from "@/store/user";
+import Container from './../../components/Container';
 
 function AccountView() {
   const $inputName = useRef<HTMLInputElement>(null);
@@ -103,13 +104,13 @@ function AccountView() {
   }
 
   return (
-    <div className="w-screen h-screen min-w-[1200px] min-h-[700px] flex items-center justify-center">
+    <Container>
       <div className="bg-gray-200 w-[400px] h-[330px] rounded-md shadow-md p-3">
         {(user.status === "not logging" && viewForm()) ||
           (user.status === "logging in" && viewLogging()) ||
           (user.status === "logged in" && viewLoggedIn())}
       </div>
-    </div>
+    </Container>
   );
 }
 

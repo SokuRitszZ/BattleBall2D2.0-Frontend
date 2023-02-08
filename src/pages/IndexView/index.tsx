@@ -1,8 +1,9 @@
+import Container from "@/components/Container";
 import { Link } from "react-router-dom";
 
 function IndexView() {
   return (
-    <div className="w-screen h-screen min-w-[1200px] min-h-[700px] flex items-center justify-center">
+    <Container>
       <div>
         <div className="text-center text-7xl">
           <p> Battle Ball 2D </p>
@@ -16,7 +17,7 @@ function IndexView() {
           </Link>
         </div>
       </div>
-    </div>
+    </Container>
   );
 }
 

@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { UserStore } from "./../../store/user";
+import Container from './../../components/Container';
 
 type typeLink = {
   to: string;
@@ -20,7 +21,7 @@ function LobbyView() {
       content: "多人游戏",
     },
     {
-      to: "/lobby",
+      to: "/settings",
       content: "账号设置",
     },
     {
@@ -34,7 +35,7 @@ function LobbyView() {
   ];
 
   return (
-    <div className="w-screen h-screen min-w-[1200px] min-h-[800px] flex justify-center items-center">
+    <Container>
       <div className="w-[400px] h-[500px] bg-slate-400 rounded-xl shadow-lg flex flex-col items-center justify-center gap-2">
         {links.map((l) => (
           <Link key={l.content} to={l.to}>
@@ -45,13 +46,8 @@ function LobbyView() {
           )
         )}
       </div>
-    </div>
+    </Container>
   );
 }
-
-type typePropsLink = {
-  to: string;
-  children: any;
-};
 
 export default LobbyView;
