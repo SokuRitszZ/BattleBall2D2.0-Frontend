@@ -29,8 +29,8 @@ function LobbyView() {
     { to: "/lobby", content: "单人游戏", },
     { to: "/lobby", content: "多人游戏", },
     { to: "/settings", content: "账号设置", },
+    { to: "/chat", content: "公共聊天", },
     { to: "/account", content: "退出大厅", },
-    { to: "/lobby", content: "公共聊天", },
   ];
 
   return (
