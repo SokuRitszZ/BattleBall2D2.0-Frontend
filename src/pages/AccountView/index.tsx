@@ -1,13 +1,18 @@
-import { useRef } from "react";
-import useUser from "@/hooks/useUser";
-import { Link } from 'react-router-dom';
+import { useContext, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import { UserStore } from "@/store/user";
 
 function AccountView() {
   const $inputName = useRef<HTMLInputElement>(null);
   const $inputPassword = useRef<HTMLInputElement>(null);
   const $inputConfirmedPassword = useRef<HTMLInputElement>(null);
 
-  const { user, login, register } = useUser();
+  const { user, login, register, loginAuto } = useContext(UserStore);
+
+  // 自动登录
+  useEffect(() => {
+    loginAuto();
+  }, []);
 
   function getForm() {
     if (
@@ -33,17 +38,6 @@ function AccountView() {
     const form = getForm();
     if (!form) return;
     login(form);
-  }
-
-  function Button(props: any) {
-    return (
-      <button
-        {...props}
-        className="bg-gray-300 p-2 rounded-md hover:bg-gray-400 active:ring-2 ring-gray-500"
-      >
-        {props.children}
-      </button>
-    );
   }
 
   function viewForm() {
@@ -79,7 +73,11 @@ function AccountView() {
   }
 
   function viewLogging() {
-    return <div className="text-5xl w-full h-full flex justify-center items-center">Logging in...</div>;
+    return (
+      <div className="text-5xl w-full h-full flex justify-center items-center">
+        Logging in...
+      </div>
+    );
   }
 
   function viewLoggedIn() {
@@ -87,12 +85,16 @@ function AccountView() {
       <>
         <div className="w-full h-full flex justify-center items-center text-center">
           <div>
-            <div className="text-4xl text-gray-600">
-              欢迎您! {user.name}
-            </div>
-            <img className="mt-4 m-auto rounded-lg shadow-lg" src={user.avatar} alt="avatar" />
+            <div className="text-4xl text-gray-600">欢迎您! {user.name}</div>
+            <img
+              className="mt-4 m-auto rounded-lg shadow-lg"
+              src={user.avatar}
+              alt="avatar"
+            />
             <Link to="/lobby">
-              <button className="bg-slate-500 text-white px-3 py-2 mt-5 rounded-md hover:bg-slate-600 active:ring-2 ring-slate-700">进入大厅</button>
+              <button className="bg-slate-500 text-white px-3 py-2 mt-5 rounded-md hover:bg-slate-600 active:ring-2 ring-slate-700">
+                进入大厅
+              </button>
             </Link>
           </div>
         </div>
@@ -112,3 +114,14 @@ function AccountView() {
 }
 
 export default AccountView;
+
+function Button(props: any) {
+  return (
+    <button
+      {...props}
+      className="bg-gray-300 p-2 rounded-md hover:bg-gray-400 active:ring-2 ring-gray-500"
+    >
+      {props.children}
+    </button>
+  );
+}

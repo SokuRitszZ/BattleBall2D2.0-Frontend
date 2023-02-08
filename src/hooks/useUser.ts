@@ -38,6 +38,7 @@ function useUser() {
 
   function setToken(token: string) {
     if (!refUser.current) return;
+    localStorage.setItem('token', token);
     setUser({
       ...refUser.current,
       token,
@@ -55,11 +56,8 @@ function useUser() {
     return user.token;
   }, [user.token]);
 
-  useEffect(() => {
-    localStorage.setItem("token", user.token);
-  }, [user.token]);
-
-  useEffect(() => {
+  async function loginAuto() {
+    console.log("loginAuto")
     if (!getToken) return;
     setState("logging in");
     getInfoApi({ token: getToken })
@@ -73,7 +71,7 @@ function useUser() {
       .catch(() => {
         setState("not logging");
       });
-  }, []);
+  }
 
   // 登录
   async function login(loginService: { name: string; password: string }) {
@@ -117,6 +115,7 @@ function useUser() {
     user,
     login,
     register,
+    loginAuto,
   };
 }
 
