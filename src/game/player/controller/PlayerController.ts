@@ -23,7 +23,7 @@ class PlayerController extends Controller {
             x: e.offsetX,
             y: e.offsetY,
           });
-          player.targetTo({ x, y });
+          if (player.HP > 0) player.targetTo({ x, y });
         }
       }
     });
@@ -53,15 +53,12 @@ class PlayerController extends Controller {
       target: window,
       event: "keyup",
       fn: (e: KeyboardEvent) => {
+        if (player.HP === 0) return ;
         player.useSkill(e.key, {
           target: this.parent.mouse,
           position: player.getPosition(),
         });
       }
-    })
-
-    this.before("destroy", () => {
-      this.clear();
     });
   }
 

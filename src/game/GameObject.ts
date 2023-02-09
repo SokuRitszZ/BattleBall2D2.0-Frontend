@@ -12,7 +12,7 @@ class GameObject {
   public hasCreated: boolean = false;
   public hasDestroyed: boolean = false;
 
-  protected id: string;
+  public id: string;
 
   private eventBefore: typeCallbackEvent;
   private eventAfter: typeCallbackEvent;
@@ -44,11 +44,8 @@ class GameObject {
     return this.parent;
   }
 
-  public setId(id: string) {
-    this.id = id;
-  }
-
   public start() {
+    if (this.hasCreated) return ;
     this.callBefore("start");
     this.hasCreated = true;
     this.callAfter("start");
@@ -66,6 +63,7 @@ class GameObject {
   }
 
   public destroy() {
+    if (this.hasDestroyed) return ;
     this.callBefore("destroy");
     this.parent.delObj(this);
     this.hasDestroyed = true;
@@ -98,8 +96,11 @@ class GameObject {
     return !!((this.updaters[tag] || []).length);
   }
 
-  public delUpdater(tag: string) {
-    this.updaters[tag] = [];
+  public delUpdater(tag: string, u?: Updater) {
+    let list = this.updaters[tag] || [];
+    if (u) list = list.filter(_u => _u !== u);
+    else list = [];
+    this.updaters[tag] = list;
     return this;
   }
 

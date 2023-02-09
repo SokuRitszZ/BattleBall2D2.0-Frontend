@@ -1,5 +1,5 @@
-import Game from '../../Game';
-import GameObject from '../../GameObject';
+import Game from '@/game/Game';
+import GameObject from '@/game/GameObject';
 import Player from '../Player';
 
 class Controller extends GameObject {
@@ -9,6 +9,10 @@ class Controller extends GameObject {
   constructor(parent: Game, player: Player) {
     super(parent);
     this.player = player;
+
+    player.before("destroy", () => {
+      this.destroy();
+    });
   }
 
   public on(event: string, fn: Function) {

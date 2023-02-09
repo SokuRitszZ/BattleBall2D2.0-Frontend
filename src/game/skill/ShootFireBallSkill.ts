@@ -17,6 +17,7 @@ class ShootFireBallSkill extends Skill {
     const angle = C.angle(position, target);
     new FireBall(this.user.getParent(), {
       angle,
+      user: this.user,
       v: 4,
       max: 8,
       position: { ...position },

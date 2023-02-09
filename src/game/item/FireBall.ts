@@ -5,14 +5,16 @@ import DirectMoveUpdater from "../updater/DirectMoveUpdater";
 import Updater from "../updater/Updater";
 import Shadow from "./Shadow";
 import ZoomUpdater from './../updater/ZoomUpdater';
+import Collision from "../Collision";
+import Player from "../player/Player";
+import repeat from "@/utils/repeat";
+import Particle from "./Particle";
 
 class FireBall extends GameObject {
-  private position: typePosition;
-  private circle: typeCircle;
-
   constructor(
     parent: Game,
     options: {
+      user: Player;
       angle: number;
       v: number;
       max: number;
@@ -20,12 +22,12 @@ class FireBall extends GameObject {
     }
   ) {
     super(parent);
-    this.circle = {
+    const circle: typeCircle = {
       r: 0.15,
     };
 
     const { angle, v, max, position } = options;
-    this.position = position;
+    const t = max / v;
     
     new DirectMoveUpdater(this, "move:direct", {
       angle,
@@ -38,25 +40,62 @@ class FireBall extends GameObject {
     });
 
     new ZoomUpdater(this, "update:zoom", {
-      circle: this.circle,
-      t: 2,
+      circle,
+      t,
     });
 
     new Updater(this, "render:ball", () => {
       const g = this.parent.g;
       g.cir({
         ...position,
-        ...this.circle,
+        ...circle,
         color: "orange",
       });
     });
     
     new Updater(this, "render:shadow", () => {
       new Shadow(this.parent, {
-        position: {...this.position},
-        circle: {...this.circle},
+        position: { ...position },
+        circle: { ...circle },
         color: "#FFA500",
+        timeLast: 0.2,
       });
+    });
+
+    this.after("destroy", () => {
+      repeat(10 + Math.random() * 10).do(() => {
+        new Particle(this.parent, {
+          v: 2,
+          max: Math.random() * 2,
+          angle: Math.random() * Math.PI * 2,
+          position: { ...position },
+          circle: { r: circle.r / 5 },
+          color: "#FFA500",
+        });
+      });
+    });
+
+    const { user } = options;
+    new Collision({
+      obj: this,
+      groupId: user.id,
+      type: "item",
+      item: {
+        position,
+        circle,
+      },
+      attacked: (g) => {
+        this.destroy();
+      },
+      attackTo: (c) => { },
+      gift: () => {
+        let damage = Math.floor(circle.r / 0.15 * 5);
+        damage = Math.max(damage, 1);
+        return {
+          damage,
+          position: { ...position },
+        };
+      },
     });
   }
 }

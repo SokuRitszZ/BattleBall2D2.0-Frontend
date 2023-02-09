@@ -21,6 +21,18 @@ class AIController extends Controller {
         });
       }
     });
+    
+    new Updater(this, "check:skill", () => {
+      const players = this.parent.players;
+      const n = players.length;
+      Object.keys(player.skill).forEach(key => {
+        if (Math.random() < 0.01)
+          player.useSkill(key, {
+            target: players[Math.floor(Math.random() * n)].getPosition(),
+            position: player.getPosition(),
+          });
+      });
+    });
   }
 }
 

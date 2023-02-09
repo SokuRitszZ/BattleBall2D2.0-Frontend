@@ -10,10 +10,10 @@ class Shadow extends GameObject {
     position: typePosition;
     circle: typeCircle;
     color: typeColor;
+    timeLast: number;
   }) {
     super(parent);
-    const { position, circle, color } = options;
-    const timeLast = 0.25;
+    const { position, circle, color, timeLast } = options;
     let opacity = { value: 1 };
     
     const g = this.parent.g;

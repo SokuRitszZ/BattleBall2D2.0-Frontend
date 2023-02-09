@@ -19,7 +19,7 @@ class Updater {
   }
 
   public release() {
-    this.obj.delUpdater(this.tag);
+    this.obj.delUpdater(this.tag, this);
   }
 }
 

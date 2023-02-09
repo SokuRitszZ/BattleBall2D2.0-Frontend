@@ -7,6 +7,8 @@ import PlayerController from './player/controller/PlayerController';
 import AIController from './player/controller/AIController';
 import leftpad from '@/utils/leftpad';
 import { typePosition } from '@/game/types';
+import Updater from './updater/Updater';
+import Collision from './Collision';
 
 type typeMode = "single" | "multi";
 
@@ -20,7 +22,7 @@ class Game {
   private hasStarted = false;
   private hasStopped = false;
   
-  private players: Player[] = [];
+  public players: Player[] = [];
   
   private $parent: HTMLDivElement;
   public $canvas: HTMLCanvasElement;
@@ -101,9 +103,14 @@ class Game {
           min: { x: 0, y: 0, },
           max: { x: 32, y: 18, },
         });
+        this.players.push(player);
       };
       break;
     }
+  }
+
+  public delPlayer(player: Player) {
+    this.players = this.players.filter(_player => _player !== player);
   }
 
   private startWithMode() {
@@ -129,6 +136,11 @@ class Game {
           });
           this.addPlayer("ai", player);
         }
+
+        const c = new GameObject(this);
+        new Updater(c, "collision", () => {
+          Collision.imitate();
+        });
       };
       break;
       case "multi": {
