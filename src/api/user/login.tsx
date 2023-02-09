@@ -4,7 +4,7 @@ async function loginApi(params: {
   name: string,
   password: string,
 }) {
-  return wait(1000).then(() => {
+  return wait(100).then(() => {
     return {
       token: "",
     };

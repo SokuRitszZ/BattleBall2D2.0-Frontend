@@ -1,7 +1,7 @@
 import Game from "./Game";
 import GameObject from "./GameObject";
 import { typePosition } from "./types";
-import Updater from './Updater';
+import Updater from './updater/Updater';
 
 class GameMap extends GameObject {
   private size: typePosition;
@@ -11,8 +11,7 @@ class GameMap extends GameObject {
   }) {
     super(parent);
     this.size = options.size;
-
-    this.addUpdater("render:map", new Updater(() => {
+    new Updater(this, "render:map", () => {
       const { x: lx, y: ly } = this.size;
       const g = this.parent.g;
       g.rec({
@@ -22,12 +21,13 @@ class GameMap extends GameObject {
         ly,
         color: "#000"
       });
-    }));
+    });
     
-    this.addUpdater("render:ping", new Updater(() => {
+    new Updater(this, "render:ping", () => {
       const g = this.parent.g;
-      for (let i = 0; i <= 16; ++i) {
-        for (let j = 0; j <= 9; ++j) {
+      const {x, y} = this.size;
+      for (let i = 0; i <= x; ++i) {
+        for (let j = 0; j <= y; ++j) {
           g.cir({
             x: i,
             y: j,
@@ -36,7 +36,7 @@ class GameMap extends GameObject {
           });
         }
       }
-    }));
+    });
   }
 }
 

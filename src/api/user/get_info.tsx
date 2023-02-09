@@ -3,7 +3,7 @@ import wait from "@/utils/wait";
 async function getInfoApi(params: {
   token: string;
 }) {
-  return wait(1000).then(() => {
+  return wait(100).then(() => {
     return {
       id: Math.random().toString(),
       name: "Bernadette",

@@ -5,8 +5,8 @@ async function registerApi(params: {
   password: string,
   confirmedPassword: string,
 }) {
-  return wait(1000).then(() => {
-    return {token: ""};
+  return wait(100).then(() => {
+    return { token: "" };
   });
 }
 

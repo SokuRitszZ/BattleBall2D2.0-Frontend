@@ -1,5 +1,5 @@
 import Game from "./Game";
-import Updater from "./Updater";
+import Updater from "./updater/Updater";
 import { nanoid } from "nanoid";
 
 type typeEvent = "start" | "update" | "destroy";
@@ -88,6 +88,10 @@ class GameObject {
     fns.push(updater);
     this.updaters[tag] = fns;
     return this;
+  }
+
+  public containsUpdater(tag: string) {
+    return !!((this.updaters[tag] || []).length);
   }
 
   public delUpdater(tag: string) {

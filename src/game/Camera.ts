@@ -2,7 +2,6 @@ import inner from '@/utils/inner';
 import Game from './Game';
 import GameObject from './GameObject';
 import { typePosition } from './types';
-import Updater from './Updater';
 
 class Camera extends GameObject {
   private scale: number = 1;
@@ -14,14 +13,6 @@ class Camera extends GameObject {
 
   constructor(parent: Game) {
     super(parent);
-  
-    this.addUpdater(
-      "move",
-      new Updater(() => {
-        const v = 1;
-        this.position.x += v * this.delta;
-      })
-    );
 
     this.before("destroy", () => {
       this.delUpdater("move");
@@ -66,8 +57,8 @@ class Camera extends GameObject {
   public real(position: typePosition) {
     const { ox, oy } = this.o();
     return {
-      x: Math.floor((ox + position.x) * this.scale * this.ratio),
-      y: Math.floor((oy + position.y) * this.scale * this.ratio),
+      x: ox + position.x / (this.scale * this.ratio),
+      y: oy + position.y / (this.scale * this.ratio),
     } as typePosition;
   }
   

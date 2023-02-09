@@ -26,6 +26,23 @@ class G {
     c.fill();
   }
 
+  public cirClip(options: typePosition & {
+    r: number,
+    image: HTMLImageElement,
+  }) {
+    let { x, y, r, image } = options;
+    const c = this.c;
+    let pos = this.camera.offset({x, y});
+    r = this.camera.scaled(r);
+
+    c.save();
+    c.beginPath();
+    c.arc(pos.x, pos.y, r, 0, Math.PI * 2);
+    c.clip();
+    c.drawImage(image, pos.x - r, pos.y - r, r * 2, r * 2);
+    c.restore();
+  }
+
   public rec(
     options: typePosition & {
       lx: number;
