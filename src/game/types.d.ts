@@ -3,4 +3,8 @@ export type typePosition = {
   y: number;
 };
 
+export type typeCircle = {
+  r: number;
+}
+
 export type typeColor = string | CanvasGradient | CanvasPattern;

@@ -36,6 +36,8 @@ class PlayerController extends Controller {
           x: e.offsetX,
           y: e.offsetY,
         });
+        this.parent.mouse.x = x;
+        this.parent.mouse.y = y;
       } 
     });
 
@@ -46,6 +48,17 @@ class PlayerController extends Controller {
         e.preventDefault();
       } 
     });
+
+    this.addHandler({
+      target: window,
+      event: "keyup",
+      fn: (e: KeyboardEvent) => {
+        player.useSkill(e.key, {
+          target: this.parent.mouse,
+          position: player.getPosition(),
+        });
+      }
+    })
 
     this.before("destroy", () => {
       this.clear();

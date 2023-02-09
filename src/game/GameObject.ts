@@ -40,6 +40,10 @@ class GameObject {
     this.parent.addObj(this);
   }
 
+  public getParent() {
+    return this.parent;
+  }
+
   public setId(id: string) {
     this.id = id;
   }

@@ -6,6 +6,7 @@ import Player from './player/Player';
 import PlayerController from './player/controller/PlayerController';
 import AIController from './player/controller/AIController';
 import leftpad from '@/utils/leftpad';
+import { typePosition } from '@/game/types';
 
 type typeMode = "single" | "multi";
 
@@ -14,6 +15,7 @@ class Game {
 
   public g: G;
   public camera: Camera;
+  public mouse: typePosition = {x: 0, y: 0};
 
   private hasStarted = false;
   private hasStopped = false;
