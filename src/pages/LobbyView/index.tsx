@@ -16,6 +16,7 @@ function LobbyView() {
   const loc = useLocation();
 
   useEffect(() => {
+    return ;
     socket.connect(`${ws[mode]}`);
   }, []);
   
@@ -26,7 +27,7 @@ function LobbyView() {
   }, [loc.pathname]);
 
   const links: typeLink[] = [
-    { to: "/lobby", content: "单人游戏", },
+    { to: "/game", content: "单人游戏", },
     { to: "/lobby", content: "多人游戏", },
     { to: "/settings", content: "账号设置", },
     { to: "/chat", content: "公共聊天", },
