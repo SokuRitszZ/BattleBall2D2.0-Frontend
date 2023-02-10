@@ -6,7 +6,7 @@ import { typePosition } from './types';
 class Camera extends GameObject {
   private scale: number = 1;
   private ratio: number = 1; 
-  private position: typePosition = { x: 0, y: 0 };
+  public position: typePosition = { x: 0, y: 0 };
   private size: typePosition = { x: 0, y: 0 };
   private min: typePosition = { x: 0, y: 0 };
   private max: typePosition = { x: 999, y: 999 };

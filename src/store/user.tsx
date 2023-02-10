@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-type typeUser = {
+export type typeUser = {
   id: string;
   name: string;
   avatar: string;

@@ -80,6 +80,7 @@ class Player extends GameObject {
       });
     });
 
+    // 设置为碰撞体
     new Collision({
       obj: this,
       groupId: this.id,
@@ -117,6 +118,16 @@ class Player extends GameObject {
         return {};
       },
     });
+
+    // 死后要判断游戏是否结束
+    this.after("destroy", () => {
+      this.parent.players.length <= 1 && this.parent.gameOver();
+    }).after("destroy", () => {
+      if (this.parent.players.length)
+        this.parent.camera.position === this.position &&
+          this.parent.camera.setPosition(this.parent.players[0].position);
+    });
+
   }
 
   public targetTo(target: typePosition) {

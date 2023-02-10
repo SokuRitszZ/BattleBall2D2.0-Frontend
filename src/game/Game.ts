@@ -9,6 +9,7 @@ import leftpad from '@/utils/leftpad';
 import { typePosition } from '@/game/types';
 import Updater from './updater/Updater';
 import Collision from './Collision';
+import { typeUser } from '@/store/user';
 
 type typeMode = "single" | "multi";
 
@@ -17,21 +18,23 @@ class Game {
 
   public g: G;
   public camera: Camera;
-  public mouse: typePosition = {x: 0, y: 0};
+  public mouse: typePosition = { x: 0, y: 0 };
 
   private hasStarted = false;
   private hasStopped = false;
-  
+
   public players: Player[] = [];
-  
+
   private $parent: HTMLDivElement;
   public $canvas: HTMLCanvasElement;
-  
+
+  public localUser?: typeUser;
+
   constructor($parent: HTMLDivElement, $canvas: HTMLCanvasElement) {
     this.$parent = $parent;
     this.$canvas = $canvas;
 
-    this.camera = new Camera(this).setPosition({x: 0, y: 0}).setRatio(1);
+    this.camera = new Camera(this).setPosition({ x: 0, y: 0 }).setRatio(1);
     this.g = new G($canvas.getContext("2d")!, this.camera);
   }
 
@@ -43,7 +46,7 @@ class Game {
   public start(mode: typeMode, data: any) {
     this.mode = mode;
     const engine = (timeStepLast: number) => {
-      if (this.hasStopped) return ;
+      if (this.hasStopped) return;
       this.objs.forEach((obj) => {
         if (obj.hasCreated) {
           obj.delta = timeStepLast - this.timeStepLast;
@@ -56,7 +59,7 @@ class Game {
       requestAnimationFrame(engine);
     };
     this.engine = requestAnimationFrame(engine);
-    
+
     this.resize();
     this.addHandler(window, "resize", () => {
       this.resize();
@@ -67,10 +70,10 @@ class Game {
       size: {
         x: 32,
         y: 18,
-      }
+      },
     });
 
-    this.startWithMode();
+    this.startWithMode(data);
     this.hasStarted = true;
   }
 
@@ -87,70 +90,95 @@ class Game {
   }
 
   public delObj(obj: GameObject) {
-    this.objs = this.objs.filter(_obj => obj !== _obj);
+    this.objs = this.objs.filter((_obj) => obj !== _obj);
   }
 
   public addPlayer(type: string, player: Player) {
     switch (type) {
-      case "pc": {
-        new PlayerController(this, player);
-        this.camera.setPosition(player.getPosition());
-        this.players.push(player);
-      };
-      break;
-      case "ai": {
-        new AIController(this, player, {
-          min: { x: 0, y: 0, },
-          max: { x: 32, y: 18, },
-        });
-        this.players.push(player);
-      };
-      break;
+      case "pc":
+        {
+          new PlayerController(this, player);
+          this.camera.setPosition(player.getPosition());
+          this.players.push(player);
+        }
+        break;
+      case "ai":
+        {
+          new AIController(this, player, {
+            min: { x: 0, y: 0 },
+            max: { x: 32, y: 18 },
+          });
+          this.players.push(player);
+        }
+        break;
     }
   }
 
   public delPlayer(player: Player) {
-    this.players = this.players.filter(_player => _player !== player);
+    this.players = this.players.filter((_player) => _player !== player);
   }
 
-  private startWithMode() {
-    switch (this.mode) {
-      case "single": {
-        // test 
-        const player = new Player(this, {
-          avatar: "#654321",
-          position: {
-            x: 2,
-            y: 2,
-          },
-        });
-        this.addPlayer("pc", player);
-        
-        for (let i = 0; i < 10; ++i) {
-          const player = new Player(this, {
-            avatar: `#${leftpad((Math.random() * 1000000) >>> 0, 6)}`,
-            position: {
-              x: Math.random() * 16,
-              y: Math.random() * 9,
-            }
-          });
-          this.addPlayer("ai", player);
-        }
+  public gameOver() {
+    this.emit("over");
+  }
 
-        const c = new GameObject(this);
-        new Updater(c, "collision", () => {
-          Collision.imitate();
-        });
-      };
-      break;
-      case "multi": {
-        
-      };
-      break;
+  private events: { [key: string]: Function[] } = {};
+
+  public on(event: string, fn: Function) {
+    const fns = this.events[event] || [];
+    fns.push(fn);
+    this.events[event] = fns;
+  }
+
+  public off(event: string, ) {
+    this.events[event] = [];
+  }
+
+  public emit(event: string, ...args: any[]) {
+    const fns = this.events[event] || [];
+    fns.forEach(fn => fn(...args));
+  }
+
+  private startWithMode(data: any) {
+    switch (this.mode) {
+      case "single":
+        {
+          // test
+          const player = new Player(this, {
+            avatar: (data as typeUser).avatar || "#654321",
+            position: {
+              x: Math.random() * 32,
+              y: Math.random() * 18,
+            },
+          });
+          this.addPlayer("pc", player);
+
+          for (let i = 0; i < 10; ++i) {
+            const player = new Player(this, {
+              avatar: `#${leftpad((Math.random() * 1000000) >>> 0, 6)}`,
+              position: {
+                x: Math.random() * 16,
+                y: Math.random() * 9,
+              },
+            });
+            this.addPlayer("ai", player);
+          }
+
+          const c = new GameObject(this);
+          new Updater(c, "collision", () => {
+            Collision.imitate();
+          });
+        }
+        break;
+      case "multi":
+        {
+        }
+        break;
     }
   }
 
-  private handlers: { target: HTMLElement | Window; event: string; fn: any }[] = [];
+  private handlers: { target: HTMLElement | Window; event: string; fn: any }[] =
+    [];
 
   private addHandler(target: HTMLElement | Window, event: string, fn: any) {
     target.addEventListener(event, fn);
@@ -162,7 +190,7 @@ class Game {
   }
 
   private clearHandler() {
-    this.handlers.forEach(handler => {
+    this.handlers.forEach((handler) => {
       const { target, event, fn } = handler;
       target.removeEventListener(event, fn);
     });
@@ -170,16 +198,13 @@ class Game {
 
   private resize() {
     const rect = this.$parent.getBoundingClientRect();
-    const {
-      width,
-      height,
-    } = {
-      width: rect.width * 5 / 6,
-      height: rect.height * 5 / 6,
+    const { width, height } = {
+      width: (rect.width * 5) / 6,
+      height: (rect.height * 5) / 6,
     };
     const scale = Math.floor(Math.min(width / 16, height / 9));
-    this.$canvas.style.setProperty('width', `${16 * scale}px`);
-    this.$canvas.style.setProperty('height', `${9 * scale}px`);
+    this.$canvas.style.setProperty("width", `${16 * scale}px`);
+    this.$canvas.style.setProperty("height", `${9 * scale}px`);
     // 记得同时也要修改画布的大小
     this.g.c.canvas.width = 16 * scale;
     this.g.c.canvas.height = 9 * scale;
@@ -188,11 +213,13 @@ class Game {
       .setSize({ x: 16, y: 9 })
       .setMinMax({
         min: {
-          x: 0, y: 0,
+          x: 0,
+          y: 0,
         },
         max: {
-          x: 32 - 16, y: 18 - 9,
-        }
+          x: 32 - 16,
+          y: 18 - 9,
+        },
       });
   }
 }
