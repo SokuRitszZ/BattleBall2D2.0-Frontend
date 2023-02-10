@@ -1,13 +1,11 @@
-import wait from "@/utils/wait";
+import api from "..";
 
 async function registerApi(params: {
   name: string,
   password: string,
   confirmedPassword: string,
 }) {
-  return wait(100).then(() => {
-    return { token: "" };
-  });
+  return api.post("/user/register", params);
 }
 
 export default registerApi;

@@ -59,8 +59,8 @@ function useUser() {
   async function loginAuto() {
     if (!getToken) return;
     setState("logging in");
-    getInfoApi({ token: getToken })
-      .then((data: typeUser) => {
+    getInfoApi()
+      .then((data: any) => {
         setUser({
           ...refUser.current,
           ...data,
@@ -76,9 +76,9 @@ function useUser() {
   async function login(loginService: { name: string; password: string }) {
     try {
       setState("logging in");
-      const { token } = await loginApi(loginService);
+      const { token } = await loginApi(loginService) as any;
       setToken(token);
-      const userGet: typeUser = await getInfoApi({ token });
+      const userGet: typeUser = await getInfoApi() as any;
       setUser({
         ...refUser.current,
         ...userGet,
@@ -102,15 +102,16 @@ function useUser() {
   }) {
     try {
       setState("logging in");
-      const { token } = await registerApi(registerService);
+      const { token } = await registerApi(registerService) as any;
       setToken(token);
-      const userGet: typeUser = await getInfoApi({ token });
+      const userGet: typeUser = await getInfoApi() as any;
       setUser({
         ...refUser.current,
         ...userGet,
         status: "logged in",
       });
     } catch (e) {
+      alert((e as Error).message);
       setState("not logging");
     }
   }
