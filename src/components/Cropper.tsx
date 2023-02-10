@@ -42,7 +42,6 @@ function Cropper(props: typeProps) {
     const url = URL.createObjectURL(file);
 
     if (!$img.current) return ;
-    console.log("crop")
     $img.current.src = url;
     cropperRef.current!.destroy();
     initCropper();

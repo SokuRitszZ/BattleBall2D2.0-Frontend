@@ -11,13 +11,14 @@ function SettingsView() {
 
   async function handleCropped(data: any) {
     try {
-      const url = await updateAvatarApi({ blob: data });
+      const { avatar } = (await updateAvatarApi({ blob: data })) as any;
       setUser({
         ...user,
-        avatar: url,
+        avatar,
       });
+      nav(-1);
     } catch (e) {
-      alert("更换头像失败");
+      alert("Token过期，请重新登录");
     }
   }
 
