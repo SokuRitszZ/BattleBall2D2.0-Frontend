@@ -4,7 +4,7 @@ import Updater from '../updater/Updater';
 import MoveTargetUpdater from '../updater/MoveTargetUpdater';
 import Skill from '../skill/Skill';
 import ShootFireBallSkill from '../skill/ShootFireBallSkill';
-import { typeCircle, typePosition } from '@/game/types';
+import { typePosition } from '@/game/types';
 import Collision from '../Collision';
 import C from '../C';
 import repeat from '@/utils/repeat';
@@ -20,8 +20,8 @@ class Player extends GameObject {
     return this._HP;
   }
   set HP(val) {
-    if (val <= 0) this.destroy();
     this._HP = val;
+    if (val <= 0) this.destroy();
   }
 
   constructor(
@@ -81,7 +81,7 @@ class Player extends GameObject {
     });
 
     // 设置为碰撞体
-    new Collision({
+    new Collision(parent, {
       obj: this,
       groupId: this.id,
       type: "player",
@@ -131,6 +131,7 @@ class Player extends GameObject {
   }
 
   public targetTo(target: typePosition) {
+    if (this.hasDestroyed) return ;
     this.delUpdater("move:target");
     new MoveTargetUpdater(this, "move:target", {
       position: this.position,
@@ -148,6 +149,7 @@ class Player extends GameObject {
   }
 
   public useSkill(key: string, ...args: any) {
+    if (this.hasDestroyed) return ;
     if (!this.skill[key]) return;
     if (!this.skill[key].try()) return;
     this.skill[key].use(...args);

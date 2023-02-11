@@ -76,7 +76,7 @@ class FireBall extends GameObject {
     });
 
     const { user } = options;
-    new Collision({
+    new Collision(parent, {
       obj: this,
       groupId: user.id,
       type: "item",

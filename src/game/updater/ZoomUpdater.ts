@@ -7,12 +7,14 @@ class ZoomUpdater extends Updater {
     circle: typeCircle;
     t: number;
   }) {
-    const { circle, t } = options;
-    const v = circle.r / t;
+    let { circle, t } = options;
+    const v = circle.r * 0.9 / t;
     super(obj, tag, () => {
+      t -= obj.delta;
+      if (t < 0) return obj.destroy();
       circle.r -= v * obj.delta;
       if (circle.r < 0) circle.r = 0;
-      if (circle.r === 0) {
+      if (circle.r < 0.01) {
         obj.destroy();
       }
     });

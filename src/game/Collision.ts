@@ -1,53 +1,19 @@
 import GameObject from "./GameObject";
 import { typeCollisionItem } from '@/game/types';
-import C from "./C";
+import Game from "./Game";
 
 class Collision {
   public static cs: Collision[] = [];
 
-  public static imitate() {
-    const n = this.cs.length;
-    const cs = [...this.cs];
-    for (let i = 0; i < n; ++i)
-      for (let j = i + 1; j < n; ++j) {
-        const a = cs[i];
-        const b = cs[j];
-        if (this.isCollided(a, b)) {
-          a.attacked(b.gift());
-          a.attackTo(b);
-          b.attacked(a.gift());
-          b.attackTo(a);
-        }
-      }
-  }
-
-  public static isCollided(a: Collision, b: Collision) {
-    if (a.groupId === b.groupId) return ;
-    const na = a.items.length,
-      nb = b.items.length;
-
-    for (let i = 0; i < na; ++i)
-      for (let j = 0; j < nb; ++j) {
-        const x = a.items[i],
-          y = b.items[j];
-        const dist = C.dist(x.position, y.position);
-        if (dist < x.circle.r + y.circle.r) {
-          return true;
-        }
-      }
-
-    return false;
-  }
-
   public type: string;
   private obj: GameObject;
-  private groupId: string | number;
-  private items: typeCollisionItem[] = [];
-  private attacked: (c: any) => void = () => {};
-  private attackTo: (c: Collision) => void = () => {};
-  private gift: Function = () => {};
+  public groupId: string | number;
+  public items: typeCollisionItem[] = [];
+  public attacked: (c: any) => void = () => {};
+  public attackTo: (c: Collision) => void = () => {};
+  public gift: Function = () => {};
 
-  constructor(options: {
+  constructor(parent: Game, options: {
     obj: GameObject,
     groupId: string,
     type: string,
@@ -64,11 +30,11 @@ class Collision {
     this.attackTo = attackTo;
     this.gift = gift;
 
-    Collision.cs.push(this);
+    parent.cc.add(this);
     this.addItem(item);
 
     this.obj.before("destroy", () => {
-      Collision.cs = Collision.cs.filter((obj) => obj !== this);
+      parent.cc.del(this);
     });
   }
 

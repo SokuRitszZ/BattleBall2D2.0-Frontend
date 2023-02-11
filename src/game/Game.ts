@@ -10,12 +10,15 @@ import { typePosition } from '@/game/types';
 import Updater from './updater/Updater';
 import Collision from './Collision';
 import { typeUser } from '@/store/user';
+import { nanoid } from 'nanoid';
+import CollisionCollection from './CollisionCollection';
 
 type typeMode = "single" | "multi";
 
 class Game {
   static cnt = 0;
 
+  public id = nanoid(11);
   public g: G;
   public camera: Camera;
   public mouse: typePosition = { x: 0, y: 0 };
@@ -29,6 +32,7 @@ class Game {
   public $canvas: HTMLCanvasElement;
 
   public localUser?: typeUser;
+  public cc: CollisionCollection = new CollisionCollection();
 
   constructor($parent: HTMLDivElement, $canvas: HTMLCanvasElement) {
     this.$parent = $parent;
@@ -166,7 +170,7 @@ class Game {
 
           const c = new GameObject(this);
           new Updater(c, "collision", () => {
-            Collision.imitate();
+            this.cc.imitate();
           });
         }
         break;
