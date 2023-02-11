@@ -14,14 +14,8 @@ function LobbyView() {
   const { user } = useContext(UserStore);
   const socket = useContext(SocketStore);
   
-  let timer: NodeJS.Timer;
-
   useEffect(() => {
     socket.on("open", () => {
-      if (timer) clearInterval(timer);
-      timer = setInterval(() => {
-        socket.send("test", "test");
-      }, 1000);
     });
     socket.connect(`${ws[mode]}/${user.token}`);
   }, []);
@@ -29,7 +23,6 @@ function LobbyView() {
   useEffect(() => {
     return () => {
       socket.clearAll();
-      clearInterval(timer);
     };
   }, []);
 
@@ -45,7 +38,7 @@ function LobbyView() {
     <Container>
       <div className="w-[400px] p-10 bg-slate-400 rounded-xl shadow-lg flex flex-col items-center justify-center gap-2">
         <img className="shadow-xl rounded-full" src={user.avatar} alt="avatar" />
-        <div className="text-5xl mb-10">{user.name}</div>
+        <div className="text-5xl mb-10 break-all">{user.name}</div>
         {links.map((l) => (
           <Link key={l.content} to={l.to}>
             <button className="px-3 py-2 bg-gray-500 hover:bg-slate-600 text-4xl text-gray-300 rounded-xl active:ring-2 ring-slate-700">
