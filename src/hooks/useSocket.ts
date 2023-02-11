@@ -18,7 +18,7 @@ function useSocket() {
     const ws = new WebSocket(url);
     ws.onmessage = (message) => {
       const msg = JSON.parse(message.data);
-      console.log(msg); //
+      // console.log(msg); //
       const { event, data } = msg;
       emit(event, data);
     };
