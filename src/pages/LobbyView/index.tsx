@@ -2,7 +2,7 @@ import Container from "@/components/Container";
 import { SocketStore } from "@/store/socket";
 import { UserStore } from "@/store/user";
 import { useContext, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { mode, ws } from "@/config.json";
 
 type typeLink = {
@@ -13,18 +13,25 @@ type typeLink = {
 function LobbyView() {
   const { user } = useContext(UserStore);
   const socket = useContext(SocketStore);
-  const loc = useLocation();
+  
+  let timer: NodeJS.Timer;
 
   useEffect(() => {
-    return ;
-    socket.connect(`${ws[mode]}`);
+    socket.on("open", () => {
+      if (timer) clearInterval(timer);
+      timer = setInterval(() => {
+        socket.send("test", "test");
+      }, 1000);
+    });
+    socket.connect(`${ws[mode]}/${user.token}`);
   }, []);
-  
+
   useEffect(() => {
-    if (loc.pathname === "/" || loc.pathname === "/account") {
-      socket.close();
-    }
-  }, [loc.pathname]);
+    return () => {
+      socket.clearAll();
+      clearInterval(timer);
+    };
+  }, []);
 
   const links: typeLink[] = [
     { to: "/game", content: "单人游戏", },

@@ -1,6 +1,4 @@
-import { useRef } from "react";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function useSocket() {
   const refEvents = useRef<Map<string, Function[]>>(
@@ -20,6 +18,7 @@ function useSocket() {
     const ws = new WebSocket(url);
     ws.onmessage = (message) => {
       const msg = JSON.parse(message.data);
+      console.log(msg); //
       const { event, data } = msg;
       emit(event, data);
     };
@@ -27,6 +26,7 @@ function useSocket() {
     ws.onclose = () => console.log("close");
     ws.onerror = (err) => console.log("error", err);
     setSocket(ws);
+    emit("open");
   }
 
   function on(event: string, callback: Function) {
@@ -43,20 +43,28 @@ function useSocket() {
     refEvents.current = new Map<string, Function[]>();
   }
 
-  function emit(event: string, data: any) {
+  function emit(event: string, ...data: any) {
     const list = refEvents.current.get(event) || [];
-    list.forEach((fn) => fn(data));
+    list.forEach((fn) => fn(...data));
   }
 
   function close() {
     if (!refSocket.current) return ;
-    if (WebSocket.CLOSED) return ;
+    if ([WebSocket.CLOSING, WebSocket.CLOSED].includes(refSocket.current.readyState)) return ;
     refSocket.current.close();
   }
 
-  function sendMessage(event: string, data: any) {
+  function send(event: string, data: any) {
     if (!refSocket.current) return;
-    refSocket.current.send(JSON.stringify({ event, data }));
+    if (refSocket.current.readyState !== WebSocket.OPEN) return ;
+    if (typeof data === "string") refSocket.current.send(data);
+    else refSocket.current.send(JSON.stringify({ event, data }));
+  }
+
+  function clearAll() {
+    if (!refSocket.current) return ;
+    const keys = [...refEvents.current.keys()];
+    keys.forEach(k => refEvents.current.set(k, []));
   }
 
   return {
@@ -65,8 +73,9 @@ function useSocket() {
     off,
     clear,
     emit,
-    sendMessage,
+    send,
     close,
+    clearAll,
   };
 }
 

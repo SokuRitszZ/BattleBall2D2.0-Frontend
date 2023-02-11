@@ -2,6 +2,7 @@ import { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { UserStore } from "@/store/user";
 import Container from './../../components/Container';
+import { SocketStore } from "@/store/socket";
 
 function AccountView() {
   const $inputName = useRef<HTMLInputElement>(null);
@@ -9,10 +10,12 @@ function AccountView() {
   const $inputConfirmedPassword = useRef<HTMLInputElement>(null);
 
   const { user, login, register, loginAuto, logout } = useContext(UserStore);
+  const { close } = useContext(SocketStore);
 
   // 自动登录
   useEffect(() => {
     loginAuto();
+    close();
   }, []);
 
   function getForm() {
