@@ -9,6 +9,7 @@ import Collision from '../Collision';
 import C from '../C';
 import repeat from '@/utils/repeat';
 import Particle from '../item/Particle';
+import Flash from '../skill/Flash';
 
 class Player extends GameObject {
   public position: typePosition;
@@ -66,6 +67,7 @@ class Player extends GameObject {
 
     // test
     this.addSkill("q", new ShootFireBallSkill(this, 0.5));
+    this.addSkill("f", new Flash(this, 1));
 
     this.after("destroy", () => {
       repeat(10 + Math.random() * 10).do(() => {
