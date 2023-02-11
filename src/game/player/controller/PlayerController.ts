@@ -11,15 +11,15 @@ type typeHandler = {
 class PlayerController extends Controller {
   private handlers: typeHandler[] = [];
 
-  constructor(parent: Game, player: Player) {
-    super(parent, player);
+  constructor(player: Player) {
+    super(player);
 
     this.addHandler({
-      target: this.parent.$canvas,
+      target: player.getParent().$canvas,
       event: "mousedown",
       fn: (e: MouseEvent) => {
         if (e.button === 2) {
-          const { x, y } = this.parent.camera.real({
+          const { x, y } = player.getParent().camera.real({
             x: e.offsetX,
             y: e.offsetY,
           });
@@ -29,20 +29,20 @@ class PlayerController extends Controller {
     });
 
     this.addHandler({
-      target: this.parent.$canvas,
+      target: player.getParent().$canvas,
       event: "mousemove",
       fn: (e: MouseEvent) => {
-        const { x, y } = this.parent.camera.real({
+        const { x, y } = player.getParent().camera.real({
           x: e.offsetX,
           y: e.offsetY,
         });
-        this.parent.mouse.x = x;
-        this.parent.mouse.y = y;
+        player.getParent().mouse.x = x;
+        player.getParent().mouse.y = y;
       } 
     });
 
     this.addHandler({
-      target: this.parent.$canvas,
+      target: player.getParent().$canvas,
       event: "contextmenu",
       fn: (e: MouseEvent) => {
         e.preventDefault();
@@ -55,10 +55,14 @@ class PlayerController extends Controller {
       fn: (e: KeyboardEvent) => {
         if (player.HP === 0) return ;
         player.useSkill(e.key, {
-          target: this.parent.mouse,
-          position: player.getPosition(),
+          target: player.getParent().mouse,
+          position: player.position,
         });
       }
+    });
+
+    player.before("destroy", () => {
+      this.clear();
     });
   }
 

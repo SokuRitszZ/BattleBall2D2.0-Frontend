@@ -5,13 +5,13 @@ import { typePosition } from "@/game/types";
 import Updater from "@/game/updater/Updater";
 
 class AIController extends Controller {
-  constructor(parent: Game, player: Player, options: {
+  constructor(player: Player, options: {
     min: typePosition,
     max: typePosition,
   }) {
-    super(parent, player);
+    super(player);
     const { min, max } = options;
-    new Updater(this, "check:move", () => {
+    new Updater(player, "check:move", () => {
       if (!player.containsUpdater("move:target")) {
         const dx = max.x - min.x;
         const dy = max.y - min.y;
@@ -22,14 +22,14 @@ class AIController extends Controller {
       }
     });
     
-    new Updater(this, "check:skill", () => {
-      const players = this.parent.players;
+    new Updater(player, "check:skill", () => {
+      const players = player.getParent().players;
       const n = players.length;
       Object.keys(player.skill).forEach(key => {
         if (Math.random() < 0.01)
           player.useSkill(key, {
-            target: players[Math.floor(Math.random() * n)].getPosition(),
-            position: player.getPosition(),
+            target: players[Math.floor(Math.random() * n)].position,
+            position: player.position,
           });
       });
     });

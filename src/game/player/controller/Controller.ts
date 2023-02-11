@@ -2,17 +2,12 @@ import Game from '@/game/Game';
 import GameObject from '@/game/GameObject';
 import Player from '../Player';
 
-class Controller extends GameObject {
+class Controller {
   private events: {[key: string]: Function[]} = {};
   protected player: Player;
   
-  constructor(parent: Game, player: Player) {
-    super(parent);
+  constructor(player: Player) {
     this.player = player;
-
-    player.before("destroy", () => {
-      this.destroy();
-    });
   }
 
   public on(event: string, fn: Function) {
