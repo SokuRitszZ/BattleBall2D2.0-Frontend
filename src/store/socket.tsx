@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-type typeSocketStore = {
+export type typeSocketStore = {
   connect: (url: string) => void;
   on: (event: string, fn: Function) => void;
   off: (event: string) => void;

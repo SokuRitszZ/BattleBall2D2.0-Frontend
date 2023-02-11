@@ -11,7 +11,7 @@ import repeat from '@/utils/repeat';
 import Particle from '../item/Particle';
 
 class Player extends GameObject {
-  private position: typePosition;
+  public position: typePosition;
   private avatar: string;
   public skill: { [key: string]: Skill } = {};
 
@@ -81,42 +81,44 @@ class Player extends GameObject {
     });
 
     // 设置为碰撞体
-    new Collision(parent, {
-      obj: this,
-      groupId: this.id,
-      type: "player",
-      item: {
-        position,
-        circle,
-      },
-      attackTo(c: Collision) {},
-      attacked: (g: any) => {
-        const { damage, position } = g;
-        if (damage) {
-          this.HP -= damage;
-          if (this.HP < 0) this.HP = 0;
-          if (this.HP === 0) this.destroy();
-          else {
-            const a = 4;
-            let v = damage;
-            let angle = C.angle(position, this.position);
+    this.after("start", () => {
+      new Collision(parent, {
+        obj: this,
+        groupId: this.id,
+        type: "player",
+        item: {
+          position,
+          circle,
+        },
+        attackTo(c: Collision) {},
+        attacked: (g: any) => {
+          const { damage, position } = g;
+          if (damage) {
+            this.HP -= damage;
+            if (this.HP < 0) this.HP = 0;
+            if (this.HP === 0) this.destroy();
+            else {
+              const a = 4;
+              let v = damage;
+              let angle = C.angle(position, this.position);
 
-            const u = new Updater(this, "update:attacked", () => {
-              const mov = v * this.delta;
-              this.position.x += mov * Math.cos(angle);
-              this.position.y += mov * Math.sin(angle);
-              v -= a * this.delta;
-              if (v < 0) v = 0;
-              if (v === 0) {
-                u.release();
-              }
-            });
+              const u = new Updater(this, "update:attacked", () => {
+                const mov = v * this.delta;
+                this.position.x += mov * Math.cos(angle);
+                this.position.y += mov * Math.sin(angle);
+                v -= a * this.delta;
+                if (v < 0) v = 0;
+                if (v === 0) {
+                  u.release();
+                }
+              });
+            }
           }
-        }
-      },
-      gift() {
-        return {};
-      },
+        },
+        gift() {
+          return {};
+        },
+      });
     });
 
     // 死后要判断游戏是否结束
@@ -127,7 +129,6 @@ class Player extends GameObject {
         this.parent.camera.position === this.position &&
           this.parent.camera.setPosition(this.parent.players[0].position);
     });
-
   }
 
   public targetTo(target: typePosition) {
@@ -140,10 +141,6 @@ class Player extends GameObject {
     });
   }
 
-  public getPosition() {
-    return this.position;
-  }
-
   public addSkill(key: string, skill: Skill) {
     this.skill[key] = skill;
   }
@@ -152,6 +149,10 @@ class Player extends GameObject {
     if (this.hasDestroyed) return ;
     if (!this.skill[key]) return;
     if (!this.skill[key].try()) return;
+    this.skill[key].use(...args);
+  }
+
+  public useSkillIgnoreCD(key: string, ...args: any) {
     this.skill[key].use(...args);
   }
 }

@@ -15,8 +15,6 @@ function LobbyView() {
   const socket = useContext(SocketStore);
   
   useEffect(() => {
-    socket.on("open", () => {
-    });
     socket.connect(`${ws[mode]}/${user.token}`);
   }, []);
 
@@ -28,7 +26,7 @@ function LobbyView() {
 
   const links: typeLink[] = [
     { to: "/game", content: "单人游戏", },
-    { to: "/lobby", content: "多人游戏", },
+    { to: "/ready", content: "多人游戏", },
     { to: "/settings", content: "账号设置", },
     { to: "/chat", content: "公共聊天", },
     { to: "/account", content: "退出大厅", },

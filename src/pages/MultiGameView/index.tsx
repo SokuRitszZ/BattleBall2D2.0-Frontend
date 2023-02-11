@@ -1,41 +1,67 @@
-import Container from "@/components/Container";
-import Game from "@/game/Game";
-import { useRef, useEffect } from 'react';
-import { useContext } from 'react';
-import { UserStore } from '@/store/user';
-import { useNavigate } from "react-router-dom";
-import { useState } from 'react';
+import Container from '@/components/Container';
+import Game from '@/game/Game';
+import { SocketStore, typeSocketStore } from '@/store/socket';
+import { typeUser, UserStore } from '@/store/user';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { typePosition } from '@/game/types';
 
-function GameView() {
+function MultiGameView() {
   const $parent = useRef<HTMLDivElement>(null);
   const $canvas = useRef<HTMLCanvasElement>(null);
   const { user } = useContext(UserStore);
   const nav = useNavigate();
   const [isOver, setOver] = useState<boolean>(false);
+  const socket = useContext(SocketStore);
 
   let game: Game;
 
   useEffect(() => {
-    const _game = startGame();
-    if (!_game) return ;
-    game = _game;
+    socket.on("game:go", (data: any) => {
+      startGame({
+        ...data,
+        socket,
+        local: user,
+      });
+    });
+    socket.on("game:over", (data: any) => {
+      setOver(true);
+    });
+    socket.send("game:go", {
+      position: {
+        x: Math.floor(Math.random() * 32),
+        y: Math.floor(Math.random() * 18),
+      },
+    });
+    return () => {
+      socket.off("game:go");
+      socket.off("game:over");
+    };
+  }, []);
+
+  useEffect(() => {
     return () => {
       game.stop();
     };
   }, []);
 
-  function startGame() {
+  function startGame(data: {
+    useSocket: Function,
+    local: typeUser,
+    positions: typePosition[],
+    users: typeUser[],
+  }) {
     setOver(false);
     if (!$parent.current || !$canvas.current) return ;
     const _game = new Game($parent.current, $canvas.current);
-    _game.start("single", user);
+    _game.start("multi", data);
     let hasShown = false;
     _game.on("over", () => {
       if (hasShown) return ;
       hasShown = true;
       setOver(true);
     });
-    return _game;
+    game = _game;
   }
 
   function Button(props: any) {
@@ -51,7 +77,6 @@ function GameView() {
       >
         <div className="text-center text-3xl font-bold">游戏结束</div>
         <div className="flex flex-col items-center mt-10 gap-7">
-          <Button onClick={() => startGame()} > 再来 </Button>
           <Button onClick={() => nav("/lobby")}>退出</Button>
         </div>
       </div>
@@ -68,4 +93,4 @@ function GameView() {
   );
 }
 
-export default GameView;
+export default MultiGameView;

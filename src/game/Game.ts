@@ -12,6 +12,9 @@ import Collision from './Collision';
 import { typeUser } from '@/store/user';
 import { nanoid } from 'nanoid';
 import CollisionCollection from './CollisionCollection';
+import { typeSocketStore } from '@/store/socket';
+import Handler from '@/utils/Handler';
+import OnlineController from './player/controller/OnlineController';
 
 type typeMode = "single" | "multi";
 
@@ -47,6 +50,8 @@ class Game {
   private engine: number = 0;
   private timeStepLast: number = -1;
 
+  private hd: Handler = new Handler();
+
   public start(mode: typeMode, data: any) {
     this.mode = mode;
     const engine = (timeStepLast: number) => {
@@ -65,8 +70,13 @@ class Game {
     this.engine = requestAnimationFrame(engine);
 
     this.resize();
-    this.addHandler(window, "resize", () => {
-      this.resize();
+    
+    this.hd.add({
+      target: window,
+      event: "resize",
+      fn: () => {
+        this.resize();
+      },
     });
 
     // game map
@@ -86,7 +96,7 @@ class Game {
     this.objs.forEach((obj) => obj.destroy());
     this.objs = [];
     cancelAnimationFrame(this.engine);
-    this.clearHandler();
+    this.hd.clear();
   }
 
   public addObj(obj: GameObject) {
@@ -97,25 +107,31 @@ class Game {
     this.objs = this.objs.filter((_obj) => obj !== _obj);
   }
 
-  public addPlayer(type: string, player: Player) {
+  public addPlayer(type: string, options: any) {
     switch (type) {
       case "pc":
         {
-          new PlayerController(this, player);
-          this.camera.setPosition(player.getPosition());
-          this.players.push(player);
+          new PlayerController(options.player);
+          this.camera.setPosition(options.player.position);
         }
         break;
       case "ai":
         {
-          new AIController(this, player, {
+          new AIController(options.player, {
             min: { x: 0, y: 0 },
             max: { x: 32, y: 18 },
           });
-          this.players.push(player);
+        }
+        break;
+      case "ol":
+        {
+          const { player, socket, isLocal } = options;
+          new OnlineController(player, socket, isLocal);
+          isLocal && this.camera.setPosition(options.player.position);
         }
         break;
     }
+    this.players.push(options.player);
   }
 
   public delPlayer(player: Player) {
@@ -147,7 +163,6 @@ class Game {
     switch (this.mode) {
       case "single":
         {
-          // test
           const player = new Player(this, {
             avatar: (data as typeUser).avatar || "#654321",
             position: {
@@ -155,7 +170,7 @@ class Game {
               y: Math.random() * 18,
             },
           });
-          this.addPlayer("pc", player);
+          this.addPlayer("pc", { player });
 
           for (let i = 0; i < 10; ++i) {
             const player = new Player(this, {
@@ -165,38 +180,37 @@ class Game {
                 y: Math.random() * 9,
               },
             });
-            this.addPlayer("ai", player);
+            this.addPlayer("ai", { player });
           }
-
-          const c = new GameObject(this);
-          new Updater(c, "collision", () => {
-            this.cc.imitate();
-          });
         }
         break;
       case "multi":
         {
+          const { positions, users, local, socket } = data as {
+            socket: typeSocketStore,
+            local: typeUser,
+            positions: typePosition[];
+            users: typeUser[];
+          };
+          users.forEach((u, i) => {
+            const p = positions[i];
+            const player = new Player(this, {
+              avatar: u.avatar,
+              position: { ...p },
+            });
+            player.id = u.id;
+            this.addPlayer("ol", {
+              isLocal: local.id === u.id,
+              socket,
+              player,
+            });
+          });
         }
         break;
     }
-  }
-
-  private handlers: { target: HTMLElement | Window; event: string; fn: any }[] =
-    [];
-
-  private addHandler(target: HTMLElement | Window, event: string, fn: any) {
-    target.addEventListener(event, fn);
-    this.handlers.push({
-      target,
-      event,
-      fn,
-    });
-  }
-
-  private clearHandler() {
-    this.handlers.forEach((handler) => {
-      const { target, event, fn } = handler;
-      target.removeEventListener(event, fn);
+    const c = new GameObject(this);
+    new Updater(c, "collision", () => {
+      this.cc.imitate();
     });
   }
 
