@@ -34,6 +34,10 @@ function MultiGameView() {
       },
     });
     return () => {
+      socket.send("game:act", {
+        method: "destroy",
+        args: [],
+      });
       socket.off("game:go");
       socket.off("game:over");
     };
