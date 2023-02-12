@@ -1,3 +1,4 @@
+import C from "../C";
 import Player from "../player/Player";
 import { typePosition } from "../types";
 import Skill from "./Skill";
@@ -9,8 +10,11 @@ class Flash extends Skill {
 
   public use(options: { target: typePosition }): void {
     const { target } = options;
-    this.user.position.x = target.x;
-    this.user.position.y = target.y;
+    let d = C.dist(this.user.position, target);
+    let angle = C.angle(this.user.position, target);
+    if (d > 5) d = 5;
+    this.user.position.x += d * Math.cos(angle);
+    this.user.position.y += d * Math.sin(angle);
     this.resetTimer();
   }
 }
