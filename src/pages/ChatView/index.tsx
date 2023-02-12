@@ -26,12 +26,16 @@ function ChatView() {
     });
     socket.on("chat:exit", (data: any) => {
       setMsgs(() => [...refMsgs.current, data]);
-    })
+    });
+    socket.on("chat:load", (data: any) => {
+      setMsgs(() => [...data.msgs]);
+    });
     socket.send("chat:join", {});
     return () => {
       socket.off("chat:new");
       socket.off("chat:join");
       socket.off("chat:exit");
+      socket.off("chat:load");
       socket.send("chat:exit", {});
     }
   }, []);
@@ -57,7 +61,7 @@ function ChatView() {
         <div>
           <div className="">{m.sender.name}</div>
           {m.msg && (
-            <div className="rounded-lg rounded-tl-none bg-slate-400 p-2 break-all">
+            <div className="rounded-lg rounded-tl-none bg-slate-400 p-2 break-all w-fit">
               {m.msg}
             </div>
           )}
@@ -105,7 +109,7 @@ function ChatView() {
         </div>
       </div>
     </Container>
-  )
+  );
 }
 
 export default ChatView;
