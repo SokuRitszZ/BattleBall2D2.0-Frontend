@@ -8,13 +8,13 @@ import AIController from './player/controller/AIController';
 import leftpad from '@/utils/leftpad';
 import { typePosition } from '@/game/types';
 import Updater from './updater/Updater';
-import Collision from './Collision';
 import { typeUser } from '@/store/user';
 import { nanoid } from 'nanoid';
 import CollisionCollection from './CollisionCollection';
 import { typeSocketStore } from '@/store/socket';
 import Handler from '@/utils/Handler';
 import OnlineController from './player/controller/OnlineController';
+import EventEmitter from '@/utils/EventEmitter';
 
 type typeMode = "single" | "multi";
 
@@ -27,6 +27,7 @@ class Game {
   public mouse: typePosition = { x: 0, y: 0 };
 
   private hasStarted = false;
+  private hasOver = false;
   private hasStopped = false;
 
   public players: Player[] = [];
@@ -51,8 +52,10 @@ class Game {
   private timeStepLast: number = -1;
 
   private hd: Handler = new Handler();
+  public ee: EventEmitter = new EventEmitter();
 
   public start(mode: typeMode, data: any) {
+    if (this.hasStarted) return ;
     this.mode = mode;
     const engine = (timeStepLast: number) => {
       if (this.hasStopped) return;
@@ -89,6 +92,7 @@ class Game {
 
     this.startWithMode(data);
     this.hasStarted = true;
+    this.ee.emit("start");
   }
 
   public stop() {
@@ -125,9 +129,16 @@ class Game {
         break;
       case "ol":
         {
-          const { player, socket, isLocal } = options;
+          const { player, socket, isLocal } = options as {
+            player: Player;
+            socket: typeSocketStore;
+            isLocal: boolean;
+          };
           new OnlineController(player, socket, isLocal);
           isLocal && this.camera.setPosition(options.player.position);
+          isLocal && player.after("destroy", () => {
+            socket.send("game:die", {});
+          });
         }
         break;
     }
@@ -139,24 +150,9 @@ class Game {
   }
 
   public gameOver() {
-    this.emit("over");
-  }
-
-  private events: { [key: string]: Function[] } = {};
-
-  public on(event: string, fn: Function) {
-    const fns = this.events[event] || [];
-    fns.push(fn);
-    this.events[event] = fns;
-  }
-
-  public off(event: string, ) {
-    this.events[event] = [];
-  }
-
-  public emit(event: string, ...args: any[]) {
-    const fns = this.events[event] || [];
-    fns.forEach(fn => fn(...args));
+    if (this.hasOver) return ;
+    this.hasOver = true;
+    this.ee.emit("over");
   }
 
   private startWithMode(data: any) {
@@ -205,6 +201,7 @@ class Game {
               player,
             });
           });
+          
         }
         break;
     }

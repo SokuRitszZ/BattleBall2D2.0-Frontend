@@ -60,7 +60,7 @@ function MultiGameView() {
     const _game = new Game($parent.current, $canvas.current);
     _game.start("multi", data);
     let hasShown = false;
-    _game.on("over", () => {
+    _game.ee.on("over", () => {
       if (hasShown) return ;
       hasShown = true;
       setOver(true);
