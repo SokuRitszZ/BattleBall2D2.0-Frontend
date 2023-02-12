@@ -18,7 +18,7 @@ class PlayerController extends Controller {
       target: player.getParent().$canvas,
       event: "mousedown",
       fn: (e: MouseEvent) => {
-        if (e.button === 2) {
+        if ([0, 2].includes(e.button)) {
           const { x, y } = player.getParent().camera.real({
             x: e.offsetX,
             y: e.offsetY,
