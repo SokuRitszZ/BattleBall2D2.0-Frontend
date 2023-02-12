@@ -1,9 +1,11 @@
 {
   "mode": 0,
   "http": [
-    "http://localhost:8080"
+    "http://localhost:8080",
+    "https://app3495.acapp.acwing.com.cn:8001"
   ],
   "ws": [
-    "ws://localhost:3000"
+    "ws://localhost:3000",
+    "wss://app3495.acapp.acwing.com.cn:3000"
   ]
 }
