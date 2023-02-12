@@ -15,6 +15,8 @@ import { typeSocketStore } from '@/store/socket';
 import Handler from '@/utils/Handler';
 import OnlineController from './player/controller/OnlineController';
 import EventEmitter from '@/utils/EventEmitter';
+import startSingleGame from './func/startSingleGame';
+import startMultiGame from './func/startMultiGame';
 
 type typeMode = "single" | "multi";
 
@@ -114,32 +116,27 @@ class Game {
   public addPlayer(type: string, options: any) {
     switch (type) {
       case "pc":
-        {
-          new PlayerController(options.player);
-          this.camera.setPosition(options.player.position);
-        }
+        new PlayerController(options.player);
+        this.camera.setPosition(options.player.position);
         break;
       case "ai":
-        {
-          new AIController(options.player, {
-            min: { x: 0, y: 0 },
-            max: { x: 32, y: 18 },
-          });
-        }
+        new AIController(options.player, {
+          min: { x: 0, y: 0 },
+          max: { x: 32, y: 18 },
+        });
         break;
       case "ol":
-        {
-          const { player, socket, isLocal } = options as {
-            player: Player;
-            socket: typeSocketStore;
-            isLocal: boolean;
-          };
-          new OnlineController(player, socket, isLocal);
-          isLocal && this.camera.setPosition(options.player.position);
-          isLocal && player.after("destroy", () => {
+        const { player, socket, isLocal } = options as {
+          player: Player;
+          socket: typeSocketStore;
+          isLocal: boolean;
+        };
+        new OnlineController(player, socket, isLocal);
+        isLocal && this.camera.setPosition(options.player.position);
+        isLocal &&
+          player.after("destroy", () => {
             socket.send("game:die", {});
           });
-        }
         break;
     }
     this.players.push(options.player);
@@ -158,51 +155,10 @@ class Game {
   private startWithMode(data: any) {
     switch (this.mode) {
       case "single":
-        {
-          const player = new Player(this, {
-            avatar: (data as typeUser).avatar || "#654321",
-            position: {
-              x: Math.random() * 32,
-              y: Math.random() * 18,
-            },
-          });
-          this.addPlayer("pc", { player });
-
-          for (let i = 0; i < 10; ++i) {
-            const player = new Player(this, {
-              avatar: `#${leftpad((Math.random() * 1000000) >>> 0, 6)}`,
-              position: {
-                x: Math.random() * 16,
-                y: Math.random() * 9,
-              },
-            });
-            this.addPlayer("ai", { player });
-          }
-        }
+        startSingleGame(this, data);
         break;
       case "multi":
-        {
-          const { positions, users, local, socket } = data as {
-            socket: typeSocketStore,
-            local: typeUser,
-            positions: typePosition[];
-            users: typeUser[];
-          };
-          users.forEach((u, i) => {
-            const p = positions[i];
-            const player = new Player(this, {
-              avatar: u.avatar,
-              position: { ...p },
-            });
-            player.id = u.id;
-            this.addPlayer("ol", {
-              isLocal: local.id === u.id,
-              socket,
-              player,
-            });
-          });
-          
-        }
+        startMultiGame(this, data);
         break;
     }
     const c = new GameObject(this);
