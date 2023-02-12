@@ -3,20 +3,21 @@ import GameObject from '../GameObject';
 import Updater from '../updater/Updater';
 import MoveTargetUpdater from '../updater/MoveTargetUpdater';
 import Skill from '../skill/Skill';
-import ShootFireBallSkill from '../skill/ShootFireBallSkill';
 import { typePosition } from '@/game/types';
 import Collision from '../Collision';
 import C from '../C';
 import repeat from '@/utils/repeat';
 import Particle from '../item/Particle';
 import Flash from '../skill/Flash';
+import ShootFireBallSkill from '../skill/ShootFireBallSkill';
+import ShootTrackBallSkill from './../skill/ShootTrackBallSkill';
 
 class Player extends GameObject {
   public position: typePosition;
   private avatar: string;
   public skill: { [key: string]: Skill } = {};
 
-  private _HP: number = 10;
+  private _HP: number = 30;
   get HP() {
     return this._HP;
   }
@@ -67,7 +68,8 @@ class Player extends GameObject {
 
     // test
     this.addSkill("q", new ShootFireBallSkill(this, 0.5));
-    this.addSkill("f", new Flash(this, 1));
+    this.addSkill("f", new Flash(this, 4));
+    this.addSkill("e", new ShootTrackBallSkill(this, 1.5));
 
     this.after("destroy", () => {
       repeat(10 + Math.random() * 10).do(() => {

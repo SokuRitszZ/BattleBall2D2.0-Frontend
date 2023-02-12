@@ -2,7 +2,7 @@ import C from "./C";
 import Collision from "./Collision";
 
 class CollisionCollection {
-  private cs: Collision[] = [];
+  public cs: Collision[] = [];
 
   public static isCollided(a: Collision, b: Collision) {
     if (a.groupId === b.groupId) return ;

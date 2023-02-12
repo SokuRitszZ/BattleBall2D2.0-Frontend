@@ -35,7 +35,7 @@ class Shadow extends GameObject {
       }
     });
 
-    new ZoomUpdater(this, "update:circle", {
+    new ZoomUpdater(this, "update:zoom", {
       circle,
       t: timeLast,
     });

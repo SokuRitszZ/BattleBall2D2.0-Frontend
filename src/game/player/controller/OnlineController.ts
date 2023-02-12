@@ -10,12 +10,14 @@ class OnlineController extends Controller {
 
     socket.on(`game:act:${player.id}`, (data: any) => {
       const { position, method, args } = data as {
-        position: typePosition;
+        position?: typePosition;
         method: string;
         args: any[];
       };
-      player.position.x = position.x;
-      player.position.y = position.y;
+      if (position) {
+        player.position.x = position.x;
+        player.position.y = position.y;
+      }
       // @ts-ignore
       player[method](...args);
     });

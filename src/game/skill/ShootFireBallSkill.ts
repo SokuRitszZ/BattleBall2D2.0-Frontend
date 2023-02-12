@@ -1,5 +1,5 @@
 import Skill from "./Skill";
-import Player from './../player/Player';
+import Player from '../player/Player';
 import { typePosition } from "../types";
 import FireBall from "../item/FireBall";
 import C from "../C";

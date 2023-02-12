@@ -10,6 +10,10 @@ export type typeCircle = {
 export type typeCollisionItem = {
   position: typePosition;
   circle: typeCircle;
-}
+};
+
+export type typeAngle = {
+  deg: number;
+};
 
 export type typeColor = string | CanvasGradient | CanvasPattern;
