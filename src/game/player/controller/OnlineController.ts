@@ -3,6 +3,7 @@ import Player from "../Player";
 import Controller from "./Controller";
 import { typePosition } from "@/game/types";
 import Handler from "@/utils/Handler";
+import C from "@/game/C";
 
 class OnlineController extends Controller {
   constructor(player: Player, socket: typeSocketStore, isLocal: boolean) {
@@ -14,7 +15,7 @@ class OnlineController extends Controller {
         method: string;
         args: any[];
       };
-      if (position) {
+      if (position && C.dist(position, player.position) > 0.2) {
         player.position.x = position.x;
         player.position.y = position.y;
       }
